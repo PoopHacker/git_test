@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SaaS Product</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --accent: #4f46e5;
+      --accent2: #7c3aed;
+      --text: #0f0f0f;
+      --muted: #6b7280;
+      --surface: #f9fafb;
+      --border: #e5e7eb;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #fff;
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* ─── NAV ─────────────────────────────────────────── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.25rem 2.5rem;
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo { font-weight: 700; font-size: 1.1rem; letter-spacing: -0.02em; }
+
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a { text-decoration: none; color: var(--muted); font-size: 0.9rem; font-weight: 500; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--text); }
+
+    .nav-cta {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 0.55rem 1.25rem;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .nav-cta:hover { opacity: 0.85; }
+
+    /* ─── MODULE 01: TEXT MASK REVEAL ────────────────── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 8rem 2rem 4rem;
+      position: relative;
+    }
+
+    .hero-eyebrow {
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-headline {
+      font-size: clamp(3rem, 8vw, 7rem);
+      font-weight: 900;
+      line-height: 1.0;
+      letter-spacing: -0.04em;
+      max-width: 900px;
+
+      /* Text mask: gradient from accent → grey, revealed by scroll */
+      background: linear-gradient(
+        to right,
+        var(--accent) 0%,
+        var(--accent2) 40%,
+        #d1d5db 40%,
+        #d1d5db 100%
+      );
+      background-size: 250% 100%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-sub {
+      margin-top: 2rem;
+      font-size: 1.2rem;
+      color: var(--muted);
+      max-width: 480px;
+      line-height: 1.6;
+      font-weight: 400;
+    }
+
+    .hero-actions {
+      margin-top: 2.5rem;
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 0.85rem 2rem;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(79,70,229,0.35); }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text);
+      border: 1.5px solid var(--border);
+      padding: 0.85rem 2rem;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    .btn-ghost:hover { border-color: var(--text); }
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 2.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--muted);
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .scroll-hint-line {
+      width: 1px;
+      height: 48px;
+      background: linear-gradient(to bottom, var(--border), transparent);
+      animation: scrollPulse 1.6s ease-in-out infinite;
+    }
+
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 0.4; transform: scaleY(1); }
+      50% { opacity: 1; transform: scaleY(0.6); }
+    }
+
+    /* ─── MODULE 02: STICKY STACK NARRATIVE ──────────── */
+    .sticky-section {
+      display: flex;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    .sticky-product {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      width: 55%;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+    }
+
+    .product-frame {
+      width: 100%;
+      max-width: 520px;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 8px 48px rgba(0,0,0,0.10), 0 1px 4px rgba(0,0,0,0.06);
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .product-titlebar {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1rem;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-red   { background: #ff5f57; }
+    .dot-yellow{ background: #febc2e; }
+    .dot-green { background: #28c840; }
+
+    .product-screen {
+      padding: 1.5rem;
+      min-height: 320px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* animated chart bars inside the mock screen */
+    .chart { display: flex; align-items: flex-end; gap: 8px; height: 180px; padding-top: 1rem; }
+    .bar {
+      flex: 1;
+      border-radius: 6px 6px 0 0;
+      background: linear-gradient(to top, var(--accent), var(--accent2));
+      opacity: 0.85;
+      animation: barGrow 2.4s ease-in-out infinite alternate;
+    }
+    .bar:nth-child(1) { height: 40%; animation-delay: 0s; }
+    .bar:nth-child(2) { height: 70%; animation-delay: 0.15s; }
+    .bar:nth-child(3) { height: 55%; animation-delay: 0.3s; }
+    .bar:nth-child(4) { height: 85%; animation-delay: 0.45s; }
+    .bar:nth-child(5) { height: 60%; animation-delay: 0.6s; }
+    .bar:nth-child(6) { height: 90%; animation-delay: 0.75s; }
+    .bar:nth-child(7) { height: 50%; animation-delay: 0.9s; }
+
+    @keyframes barGrow { from { opacity: 0.6; } to { opacity: 1; } }
+
+    .metric-row {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .metric {
+      flex: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.75rem;
+    }
+
+    .metric-label { font-size: 0.7rem; color: var(--muted); margin-bottom: 0.25rem; }
+    .metric-value { font-size: 1.1rem; font-weight: 700; letter-spacing: -0.02em; }
+    .metric-delta { font-size: 0.7rem; color: #10b981; font-weight: 600; }
+
+    /* active feature highlight on the screen */
+    .feature-highlight {
+      position: absolute;
+      top: 1rem; right: 1rem;
+      background: var(--accent);
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 0.3rem 0.75rem;
+      border-radius: 20px;
+      opacity: 0;
+      transform: translateY(-6px);
+      transition: opacity 0.4s, transform 0.4s;
+    }
+    .feature-highlight.visible { opacity: 1; transform: translateY(0); }
+
+    .narrative-col {
+      width: 45%;
+      padding: 8rem 3.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .narrative-feature {
+      padding: 4rem 0;
+      border-bottom: 1px solid var(--border);
+      opacity: 0.35;
+      transition: opacity 0.4s;
+    }
+    .narrative-feature:last-child { border-bottom: none; }
+    .narrative-feature.active { opacity: 1; }
+
+    .feature-number {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+
+    .feature-title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+      margin-bottom: 0.75rem;
+    }
+
+    .feature-body {
+      font-size: 1rem;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    /* ─── MODULE 16: SPOTLIGHT BORDER CARDS ─────────── */
+    .cards-section {
+      padding: 8rem 2rem;
+      background: #fff;
+      text-align: center;
+    }
+
+    .section-eyebrow {
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    .section-heading {
+      font-size: clamp(2rem, 4vw, 3.25rem);
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      margin-bottom: 1rem;
+    }
+
+    .section-sub {
+      font-size: 1.05rem;
+      color: var(--muted);
+      max-width: 480px;
+      margin: 0 auto 4rem;
+      line-height: 1.6;
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.25rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    /* Spotlight border card */
+    .sp-card {
+      position: relative;
+      border-radius: 16px;
+      padding: 2rem;
+      background: #fff;
+      text-align: left;
+      cursor: default;
+      isolation: isolate;
+      overflow: hidden;
+    }
+
+    /* Static base border */
+    .sp-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1px;
+      background: var(--border);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+
+    /* Spotlight border — follows cursor via CSS vars */
+    .sp-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1.5px;
+      background: radial-gradient(
+        200px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+        var(--accent) 0%,
+        transparent 100%
+      );
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: 0;
+      transition: opacity 0.35s;
+      pointer-events: none;
+    }
+
+    .sp-card:hover::after { opacity: 1; }
+
+    .card-icon {
+      width: 44px;
+      height: 44px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.5rem;
+    }
+
+    .card-body {
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    /* ─── FOOTER ──────────────────────────────────────── */
+    footer {
+      padding: 3rem 2.5rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <span class="nav-logo">Acme</span>
+    <ul class="nav-links">
+      <li><a href="#product">Product</a></li>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#">Pricing</a></li>
+      <li><a href="#">Docs</a></li>
+    </ul>
+    <button class="nav-cta">Get started free</button>
+  </nav>
+
+  <!-- ── MODULE 01: TEXT MASK REVEAL ── -->
+  <section class="hero">
+    <p class="hero-eyebrow">Now in public beta</p>
+    <h1 class="hero-headline" id="heroHeadline">
+      Ship faster.<br>Scale smarter.
+    </h1>
+    <p class="hero-sub">
+      The all-in-one platform that helps your team move from idea to production
+      without the operational overhead.
+    </p>
+    <div class="hero-actions">
+      <button class="btn-primary">Start for free</button>
+      <button class="btn-ghost">Watch demo →</button>
+    </div>
+    <div class="scroll-hint">
+      <div class="scroll-hint-line"></div>
+      <span>Scroll</span>
+    </div>
+  </section>
+
+  <!-- ── MODULE 02: STICKY STACK NARRATIVE ── -->
+  <section class="sticky-section" id="product">
+
+    <div class="sticky-product">
+      <div class="product-frame">
+        <div class="product-titlebar">
+          <span class="dot dot-red"></span>
+          <span class="dot dot-yellow"></span>
+          <span class="dot dot-green"></span>
+        </div>
+        <div class="product-screen">
+          <span class="feature-highlight" id="featureHighlight">Analytics</span>
+          <div class="chart">
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+          </div>
+          <div class="metric-row">
+            <div class="metric">
+              <div class="metric-label">Revenue</div>
+              <div class="metric-value">$84.2k</div>
+              <div class="metric-delta">↑ 12.4%</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">Users</div>
+              <div class="metric-value">14,839</div>
+              <div class="metric-delta">↑ 8.1%</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">Uptime</div>
+              <div class="metric-value">99.98%</div>
+              <div class="metric-delta">↑ stable</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="narrative-col">
+      <div class="narrative-feature active" data-label="Analytics">
+        <div class="feature-number">01 / Product</div>
+        <h2 class="feature-title">Real-time analytics, finally readable</h2>
+        <p class="feature-body">
+          See every metric that matters in one place. No SQL required.
+          Dashboards update live and alert you before problems become incidents.
+        </p>
+      </div>
+      <div class="narrative-feature" data-label="Deployments">
+        <div class="feature-number">02 / Deploy</div>
+        <h2 class="feature-title">One-click deploys with zero downtime</h2>
+        <p class="feature-body">
+          Push to production confidently. Canary releases, automatic rollbacks,
+          and environment parity baked in from day one.
+        </p>
+      </div>
+      <div class="narrative-feature" data-label="Collaboration">
+        <div class="feature-number">03 / Team</div>
+        <h2 class="feature-title">Built for the whole team, not just engineers</h2>
+        <p class="feature-body">
+          Role-based access, audit logs, and a shared workspace so product,
+          design, and engineering stay aligned without the back-and-forth.
+        </p>
+      </div>
+      <div class="narrative-feature" data-label="Scale">
+        <div class="feature-number">04 / Infra</div>
+        <h2 class="feature-title">Infrastructure that grows with you</h2>
+        <p class="feature-body">
+          From your first user to your millionth. Auto-scaling, global edge
+          delivery, and SOC 2 compliance included on every plan.
+        </p>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ── MODULE 16: SPOTLIGHT BORDER CARDS ── -->
+  <section class="cards-section" id="features">
+    <p class="section-eyebrow">Features</p>
+    <h2 class="section-heading">Everything you need, nothing you don't</h2>
+    <p class="section-sub">
+      Designed to replace five tools you're already paying for.
+    </p>
+
+    <div class="cards-grid" id="cardsGrid">
+      <div class="sp-card">
+        <div class="card-icon">⚡</div>
+        <h3 class="card-title">Instant setup</h3>
+        <p class="card-body">Connect your repo and deploy in under 3 minutes. No config files, no YAML archaeology.</p>
+      </div>
+      <div class="sp-card">
+        <div class="card-icon">🔒</div>
+        <h3 class="card-title">Enterprise security</h3>
+        <p class="card-body">SOC 2 Type II, SSO, audit logs, and secrets management — available on every plan.</p>
+      </div>
+      <div class="sp-card">
+        <div class="card-icon">📊</div>
+        <h3 class="card-title">Unified analytics</h3>
+        <p class="card-body">Product, performance, and infrastructure metrics in a single pane of glass.</p>
+      </div>
+      <div class="sp-card">
+        <div class="card-icon">🌐</div>
+        <h3 class="card-title">Global edge network</h3>
+        <p class="card-body">Deploy to 30+ regions with automatic routing to the nearest node. Sub-50ms everywhere.</p>
+      </div>
+      <div class="sp-card">
+        <div class="card-icon">🔁</div>
+        <h3 class="card-title">Smart rollbacks</h3>
+        <p class="card-body">Automatic anomaly detection triggers instant rollback before your users notice anything.</p>
+      </div>
+      <div class="sp-card">
+        <div class="card-icon">🧩</div>
+        <h3 class="card-title">200+ integrations</h3>
+        <p class="card-body">Slack, GitHub, Datadog, PagerDuty — plug into your existing workflow on day one.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <span class="nav-logo">Acme</span>
+    <span>© 2025 Acme, Inc. — Built with Cinematic Site Modules</span>
+  </footer>
+
+  <script>
+    gsap.registerPlugin(ScrollTrigger);
+
+    /* ── MODULE 01: Text Mask Reveal ── */
+    const headline = document.getElementById('heroHeadline');
+    gsap.to(headline, {
+      backgroundPositionX: '0%',
+      ease: 'none',
+      scrollTrigger: {
+        trigger: headline,
+        start: 'top 80%',
+        end: 'bottom 30%',
+        scrub: 1,
+      }
+    });
+    // init position so color starts from right (grey side)
+    gsap.set(headline, { backgroundPositionX: '100%' });
+
+    /* ── MODULE 02: Sticky Stack Narrative ── */
+    const features = document.querySelectorAll('.narrative-feature');
+    const highlight = document.getElementById('featureHighlight');
+
+    features.forEach((feature, i) => {
+      ScrollTrigger.create({
+        trigger: feature,
+        start: 'top center',
+        end: 'bottom center',
+        onEnter: () => activateFeature(i),
+        onEnterBack: () => activateFeature(i),
+      });
+    });
+
+    function activateFeature(index) {
+      features.forEach((f, i) => f.classList.toggle('active', i === index));
+      const label = features[index].dataset.label;
+      highlight.textContent = label;
+      highlight.classList.remove('visible');
+      requestAnimationFrame(() => highlight.classList.add('visible'));
+    }
+
+    /* ── MODULE 16: Spotlight Border Cards ── */
+    document.querySelectorAll('.sp-card').forEach(card => {
+      card.addEventListener('mousemove', e => {
+        const rect = card.getBoundingClientRect();
+        card.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
+        card.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
+      });
+    });
+  </script>
+</body>
+</html>

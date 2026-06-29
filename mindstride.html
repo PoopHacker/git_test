@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MindStride — Rethink Employee Health Care</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --violet: #6b46c1;
+      --violet2: #9333ea;
+      --teal: #0d9488;
+      --text: #111827;
+      --muted: #6b7280;
+      --surface: #f9fafb;
+      --border: #e5e7eb;
+      --dark: #0f172a;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: #fff; color: var(--text); overflow-x: hidden; }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.1rem 2.5rem;
+      background: rgba(255,255,255,0.92); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo { font-weight: 800; font-size: 1.15rem; color: var(--violet); letter-spacing: -0.03em; }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a { text-decoration: none; color: var(--muted); font-size: 0.875rem; font-weight: 500; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta {
+      background: var(--violet); color: #fff; border: none;
+      padding: 0.6rem 1.4rem; border-radius: 8px; font-size: 0.875rem; font-weight: 600;
+      cursor: pointer; transition: opacity 0.2s;
+    }
+    .nav-cta:hover { opacity: 0.85; }
+
+    /* ── MODULE 01: TEXT MASK REVEAL — HERO ── */
+    .hero {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #1a0533 100%);
+      display: flex; flex-direction: column;
+      align-items: flex-start; justify-content: center;
+      padding: 8rem 6rem 5rem;
+      position: relative; overflow: hidden;
+    }
+
+    /* Background texture blobs */
+    .hero::before {
+      content: '';
+      position: absolute; top: -20%; right: -10%;
+      width: 600px; height: 600px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(107,70,193,0.3) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero::after {
+      content: '';
+      position: absolute; bottom: -10%; left: 20%;
+      width: 400px; height: 400px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(13,148,136,0.2) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-eyebrow {
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--teal); margin-bottom: 1.5rem;
+    }
+
+    /* Text mask: starts grey, fills with violet→purple gradient on scroll */
+    .hero-headline {
+      font-size: clamp(2.5rem, 5.5vw, 5rem);
+      font-weight: 900; line-height: 1.05; letter-spacing: -0.04em;
+      max-width: 780px;
+      background: linear-gradient(
+        to right,
+        #fff 0%, #e9d5ff 30%, var(--violet2) 55%,
+        rgba(255,255,255,0.25) 55%, rgba(255,255,255,0.25) 100%
+      );
+      background-size: 210% 100%;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+
+    .hero-sub {
+      margin-top: 1.75rem; font-size: 1.15rem;
+      color: rgba(255,255,255,0.6); max-width: 520px; line-height: 1.7;
+    }
+
+    .hero-actions { margin-top: 2.5rem; display: flex; gap: 1rem; flex-wrap: wrap; }
+    .btn-primary {
+      background: var(--violet); color: #fff; border: none;
+      padding: 0.9rem 2.2rem; border-radius: 10px; font-size: 1rem; font-weight: 600;
+      cursor: pointer; transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(107,70,193,0.5); }
+    .btn-ghost {
+      background: transparent; color: rgba(255,255,255,0.8);
+      border: 1.5px solid rgba(255,255,255,0.25);
+      padding: 0.9rem 2.2rem; border-radius: 10px; font-size: 1rem; font-weight: 500;
+      cursor: pointer; transition: border-color 0.2s;
+    }
+    .btn-ghost:hover { border-color: rgba(255,255,255,0.6); }
+
+    .hero-logos {
+      margin-top: 4rem; display: flex; align-items: center; gap: 2rem;
+    }
+    .hero-logos span { font-size: 0.72rem; color: rgba(255,255,255,0.35); letter-spacing: 0.08em; text-transform: uppercase; }
+    .logo-pill {
+      background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 8px; padding: 0.4rem 1rem;
+      color: rgba(255,255,255,0.55); font-size: 0.85rem; font-weight: 600;
+    }
+
+    .scroll-hint {
+      position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+      color: rgba(255,255,255,0.3); font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase;
+    }
+    .scroll-hint-line {
+      width: 1px; height: 48px;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.3), transparent);
+      animation: pulse 1.8s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100% { opacity:0.3; } 50% { opacity:1; } }
+
+    /* ── MODULE 20: ODOMETER COUNTER — STATS ── */
+    .stats-section {
+      background: #fff; padding: 7rem 2rem;
+      text-align: center;
+    }
+    .stats-label {
+      font-size: 0.8rem; font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--teal); margin-bottom: 1rem;
+    }
+    .stats-heading {
+      font-size: clamp(1.6rem, 3vw, 2.5rem); font-weight: 800;
+      letter-spacing: -0.03em; margin-bottom: 1rem; max-width: 640px; margin-inline: auto;
+    }
+    .stats-sub {
+      font-size: 1rem; color: var(--muted); max-width: 520px;
+      margin: 0 auto 5rem; line-height: 1.6;
+    }
+
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 2rem; max-width: 900px; margin: 0 auto;
+    }
+
+    .stat-card {
+      padding: 2.5rem 2rem; border-radius: 20px;
+      background: var(--surface); border: 1px solid var(--border);
+      position: relative; overflow: hidden;
+    }
+    .stat-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(to right, var(--violet), var(--violet2));
+      border-radius: 20px 20px 0 0;
+    }
+
+    /* Odometer: a column of digits that slides to reveal the target */
+    .odometer {
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: clamp(3rem, 6vw, 5rem); font-weight: 900;
+      letter-spacing: -0.04em; line-height: 1;
+      color: var(--violet); margin-bottom: 0.75rem;
+    }
+
+    .odometer-digit-wrap {
+      height: 1.05em; overflow: hidden; position: relative;
+    }
+    .odometer-reel {
+      display: flex; flex-direction: column; transition: transform 0.0s;
+    }
+    .odometer-reel span {
+      display: block; height: 1.05em; line-height: 1.05em; text-align: center;
+    }
+
+    .stat-suffix {
+      font-size: clamp(1.5rem, 3vw, 2.5rem); font-weight: 900; color: var(--violet2);
+    }
+    .stat-description {
+      font-size: 1rem; color: var(--text); font-weight: 600; margin-bottom: 0.4rem;
+    }
+    .stat-source { font-size: 0.75rem; color: var(--muted); }
+
+    /* ── MODULE 02: STICKY STACK NARRATIVE — EAP PROBLEMS ── */
+    .sticky-section {
+      display: flex; position: relative; background: var(--dark);
+    }
+
+    .sticky-visual {
+      position: sticky; top: 0; height: 100vh; width: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      padding: 3rem;
+    }
+
+    .problem-card {
+      width: 100%; max-width: 420px;
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px; padding: 2.5rem; position: relative; overflow: hidden;
+    }
+    .problem-card::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(circle at 30% 30%, rgba(107,70,193,0.2), transparent 60%);
+      pointer-events: none;
+    }
+
+    .problem-icon {
+      width: 56px; height: 56px; border-radius: 14px; margin-bottom: 1.5rem;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem;
+      background: rgba(107,70,193,0.2); border: 1px solid rgba(107,70,193,0.3);
+      transition: background 0.5s, border-color 0.5s;
+    }
+    .problem-card-title {
+      font-size: 1.5rem; font-weight: 800; color: #fff; letter-spacing: -0.03em;
+      margin-bottom: 0.75rem; min-height: 3.5rem;
+      transition: opacity 0.4s;
+    }
+    .problem-card-body {
+      font-size: 0.95rem; color: rgba(255,255,255,0.55); line-height: 1.7;
+      transition: opacity 0.4s;
+    }
+
+    /* animated underline on the word being highlighted */
+    .highlight-word {
+      color: var(--violet2); position: relative;
+    }
+
+    .vs-badge {
+      display: inline-block; margin-top: 2rem;
+      background: rgba(13,148,136,0.15); border: 1px solid rgba(13,148,136,0.3);
+      color: var(--teal); font-size: 0.75rem; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 0.35rem 1rem; border-radius: 20px;
+    }
+
+    .narrative-col {
+      width: 50%; padding: 8rem 4rem;
+    }
+
+    .section-intro {
+      margin-bottom: 5rem;
+    }
+    .section-intro-eyebrow {
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--teal); margin-bottom: 1rem;
+    }
+    .section-intro-heading {
+      font-size: clamp(2rem, 3.5vw, 3rem); font-weight: 900;
+      letter-spacing: -0.04em; color: #fff; line-height: 1.1;
+    }
+    .section-intro-heading em { color: var(--violet2); font-style: normal; }
+
+    .narrative-item {
+      padding: 4rem 0; border-bottom: 1px solid rgba(255,255,255,0.08);
+      opacity: 0.3; transition: opacity 0.45s;
+    }
+    .narrative-item:last-child { border-bottom: none; }
+    .narrative-item.active { opacity: 1; }
+
+    .item-number {
+      font-size: 0.7rem; font-weight: 700; color: var(--violet2);
+      letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 1rem;
+    }
+    .item-title {
+      font-size: 1.7rem; font-weight: 800; color: #fff;
+      letter-spacing: -0.03em; line-height: 1.2; margin-bottom: 0.75rem;
+    }
+    .item-body { font-size: 1rem; color: rgba(255,255,255,0.55); line-height: 1.7; }
+
+    /* ── SOLUTION SECTION ── */
+    .solution-section {
+      background: #fff; padding: 8rem 2rem; text-align: center;
+    }
+    .solution-eyebrow {
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--teal); margin-bottom: 1rem;
+    }
+    .solution-heading {
+      font-size: clamp(2rem, 4vw, 3.25rem); font-weight: 900;
+      letter-spacing: -0.04em; margin-bottom: 1rem;
+    }
+    .solution-sub {
+      font-size: 1.05rem; color: var(--muted);
+      max-width: 500px; margin: 0 auto 4rem; line-height: 1.6;
+    }
+
+    .solution-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.25rem; max-width: 1000px; margin: 0 auto;
+    }
+
+    /* Spotlight border cards (Module 16) */
+    .sp-card {
+      position: relative; border-radius: 16px; padding: 2rem;
+      background: #fff; text-align: left; cursor: default;
+      isolation: isolate; overflow: hidden;
+    }
+    .sp-card::before {
+      content: ''; position: absolute; inset: 0; border-radius: inherit; padding: 1px;
+      background: var(--border);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none;
+    }
+    .sp-card::after {
+      content: ''; position: absolute; inset: 0; border-radius: inherit; padding: 1.5px;
+      background: radial-gradient(180px circle at var(--mouse-x,50%) var(--mouse-y,50%), var(--violet) 0%, transparent 100%);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor; mask-composite: exclude;
+      opacity: 0; transition: opacity 0.35s; pointer-events: none;
+    }
+    .sp-card:hover::after { opacity: 1; }
+    .card-icon {
+      width: 44px; height: 44px; border-radius: 10px; margin-bottom: 1.25rem;
+      background: var(--surface); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center; font-size: 1.25rem;
+    }
+    .card-title { font-size: 1rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 0.4rem; }
+    .card-body { font-size: 0.875rem; color: var(--muted); line-height: 1.6; }
+
+    /* ── TESTIMONIALS ── */
+    .testimonials-section {
+      background: var(--surface); padding: 7rem 2rem; text-align: center;
+    }
+    .testimonials-eyebrow {
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--teal); margin-bottom: 1rem;
+    }
+    .testimonials-heading {
+      font-size: clamp(1.8rem, 3vw, 2.75rem); font-weight: 900;
+      letter-spacing: -0.04em; margin-bottom: 3.5rem;
+    }
+    .testimonials-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem; max-width: 1000px; margin: 0 auto;
+    }
+    .testimonial-card {
+      background: #fff; border: 1px solid var(--border); border-radius: 16px;
+      padding: 2rem; text-align: left;
+    }
+    .stars { color: #f59e0b; font-size: 0.9rem; margin-bottom: 1rem; letter-spacing: 2px; }
+    .testimonial-quote { font-size: 0.95rem; color: var(--text); line-height: 1.7; margin-bottom: 1.25rem; }
+    .testimonial-author { font-size: 0.8rem; font-weight: 700; color: var(--muted); }
+
+    /* ── CTA ── */
+    .cta-section {
+      background: linear-gradient(135deg, #1e1b4b 0%, #1a0533 100%);
+      padding: 7rem 2rem; text-align: center; position: relative; overflow: hidden;
+    }
+    .cta-section::before {
+      content: ''; position: absolute; top: -30%; left: 50%; transform: translateX(-50%);
+      width: 700px; height: 700px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(107,70,193,0.25), transparent 65%);
+      pointer-events: none;
+    }
+    .cta-heading {
+      font-size: clamp(2rem, 4vw, 3.5rem); font-weight: 900;
+      letter-spacing: -0.04em; color: #fff; margin-bottom: 1rem; position: relative;
+    }
+    .cta-sub { font-size: 1.1rem; color: rgba(255,255,255,0.6); margin-bottom: 2.5rem; position: relative; }
+    .cta-btn {
+      background: #fff; color: var(--violet); border: none;
+      padding: 1rem 2.5rem; border-radius: 12px; font-size: 1.05rem; font-weight: 700;
+      cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; position: relative;
+    }
+    .cta-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 2.5rem 2.5rem; border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      color: var(--muted); font-size: 0.8rem;
+    }
+    .footer-logo { font-weight: 800; font-size: 1rem; color: var(--violet); }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <span class="nav-logo">MindStride</span>
+    <ul class="nav-links">
+      <li><a href="#stats">The Problem</a></li>
+      <li><a href="#eap">Our Approach</a></li>
+      <li><a href="#solution">How It Works</a></li>
+    </ul>
+    <button class="nav-cta">Book a demo</button>
+  </nav>
+
+  <!-- ── MODULE 01: TEXT MASK REVEAL — HERO ── -->
+  <section class="hero">
+    <p class="hero-eyebrow">Employee Mental Health Platform</p>
+    <h1 class="hero-headline" id="heroHeadline">
+      It's time to rethink<br>health care for<br>your employees.
+    </h1>
+    <p class="hero-sub">
+      MindStride connects your team to the mental health support they actually need —
+      faster, smarter, and built for real life.
+    </p>
+    <div class="hero-actions">
+      <button class="btn-primary">Book a demo</button>
+      <button class="btn-ghost">See how it works →</button>
+    </div>
+    <div class="hero-logos">
+      <span>Trusted by teams at</span>
+      <span class="logo-pill">knak</span>
+      <span class="logo-pill">acasta</span>
+    </div>
+    <div class="scroll-hint">
+      <div class="scroll-hint-line"></div>
+      <span>Scroll</span>
+    </div>
+  </section>
+
+  <!-- ── MODULE 20: ODOMETER COUNTER — STATS ── -->
+  <section class="stats-section" id="stats">
+    <p class="stats-label">The reality in Canada</p>
+    <h2 class="stats-heading">Canadian employees struggle to access the care they need</h2>
+    <p class="stats-sub">The data is clear. The current system isn't working — and your employees are feeling it.</p>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="odometer" id="odom1">
+          <div class="odometer-digit-wrap"><div class="odometer-reel" id="reel1a"><span>1</span></div></div>
+          <span>&nbsp;in&nbsp;</span>
+          <div class="odometer-digit-wrap"><div class="odometer-reel" id="reel1b"><span>0</span><span>1</span><span>2</span><span>3</span></div></div>
+        </div>
+        <p class="stat-description">Employees don't have a family doctor</p>
+        <p class="stat-source">Statistics Canada, 2019</p>
+      </div>
+      <div class="stat-card">
+        <div class="odometer" id="odom2">
+          <div class="odometer-digit-wrap"><div class="odometer-reel" id="reel2a"><span>0</span><span>1</span></div></div>
+          <span>&nbsp;in&nbsp;</span>
+          <div class="odometer-digit-wrap"><div class="odometer-reel" id="reel2b"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span></div></div>
+        </div>
+        <p class="stat-description">Employees are lost in care</p>
+        <p class="stat-source">CAMH, 2022</p>
+      </div>
+      <div class="stat-card">
+        <div class="odometer" id="odom3">
+          <div class="odometer-digit-wrap" style="overflow:hidden">
+            <div class="odometer-reel" id="reel3">
+              <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span>
+              <span>5</span><span>6</span><span>7</span><span>8</span><span>9</span>
+              <span>5</span>
+            </div>
+          </div>
+          <span class="stat-suffix">%</span>
+        </div>
+        <p class="stat-description">Can't access mental health care</p>
+        <p class="stat-source">Mental Health Commission of Canada</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── MODULE 02: STICKY STACK NARRATIVE — EAP PROBLEMS ── -->
+  <section class="sticky-section" id="eap">
+
+    <div class="sticky-visual">
+      <div class="problem-card">
+        <div class="problem-icon" id="problemIcon">⏳</div>
+        <div class="problem-card-title" id="problemTitle">Delayed Access</div>
+        <div class="problem-card-body" id="problemBody">
+          Employees wait months for appointments, losing critical time when they need help most.
+        </div>
+        <span class="vs-badge">The old way</span>
+      </div>
+    </div>
+
+    <div class="narrative-col">
+      <div class="section-intro">
+        <p class="section-intro-eyebrow">The problem</p>
+        <h2 class="section-intro-heading">
+          Current EAPs are<br>
+          <em>ineffective,</em><br>
+          underutilized &amp; outdated
+        </h2>
+      </div>
+
+      <div class="narrative-item active" data-icon="⏳" data-title="Delayed Access" data-body="Employees wait months for appointments, losing critical time when they need help most.">
+        <div class="item-number">01 / Problem</div>
+        <h3 class="item-title">Delayed Access</h3>
+        <p class="item-body">Most EAP appointments are booked weeks or months out. By the time an employee gets seen, a manageable problem has become a crisis — costing your business in absenteeism and turnover.</p>
+      </div>
+
+      <div class="narrative-item" data-icon="🎯" data-title="Generalist Approach" data-body="One-size-fits-all guidance that doesn't meet employees where they actually are.">
+        <div class="item-number">02 / Problem</div>
+        <h3 class="item-title">Generalist Approach</h3>
+        <p class="item-body">Traditional EAPs assign whoever is available, not whoever is right. Employees end up with generic guidance that doesn't account for their culture, language, or specific situation — so they disengage.</p>
+      </div>
+
+      <div class="narrative-item" data-icon="🔁" data-title="Reactive &amp; Outdated" data-body="Systems built for crisis response, not prevention — leaving the root cause untouched.">
+        <div class="item-number">03 / Problem</div>
+        <h3 class="item-title">Reactive &amp; Outdated</h3>
+        <p class="item-body">Legacy EAPs were designed for crisis response only. They don't invest in prevention, ongoing support, or measurement — so employers can't tell if they're making any difference at all.</p>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ── MODULE 16: SPOTLIGHT BORDER CARDS — SOLUTION ── -->
+  <section class="solution-section" id="solution">
+    <p class="solution-eyebrow">The MindStride difference</p>
+    <h2 class="solution-heading">Better healthcare at work</h2>
+    <p class="solution-sub">Your team deserves a system built for how people actually experience stress, burnout, and mental health challenges today.</p>
+
+    <div class="solution-grid">
+      <div class="sp-card">
+        <div class="card-icon">⚡</div>
+        <h3 class="card-title">Same-week access</h3>
+        <p class="card-body">Employees connect with a matched counsellor in days, not months. Help arrives when it can still prevent a crisis.</p>
+      </div>
+      <div class="sp-card">
+        <div class="card-icon">🎯</div>
+        <h3 class="card-title">Matched to your needs</h3>
+        <p class="card-body">Our platform matches employees to the right provider based on speciality, language, culture, and availability.</p>
+      </div>
+      <div class="sp-card">
+        <div class="card-icon">📊</div>
+        <h3 class="card-title">Measurable outcomes</h3>
+        <p class="card-body">Real-time employer dashboards show utilization, outcomes, and ROI — so you can see what's actually working.</p>
+      </div>
+      <div class="sp-card">
+        <div class="card-icon">🛡️</div>
+        <h3 class="card-title">Proactive &amp; preventive</h3>
+        <p class="card-body">Coaching, digital tools, and check-ins that support employees before problems escalate into absences.</p>
+      </div>
+      <div class="sp-card">
+        <div class="card-icon">🌐</div>
+        <h3 class="card-title">Whole-person support</h3>
+        <p class="card-body">Mental health, financial wellness, nutrition, and legal support — all in one place, all included.</p>
+      </div>
+      <div class="sp-card">
+        <div class="card-icon">🔒</div>
+        <h3 class="card-title">Private by design</h3>
+        <p class="card-body">Employees engage with full confidence. We never share individual data with employers — ever.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── TESTIMONIALS ── -->
+  <section class="testimonials-section">
+    <p class="testimonials-eyebrow">Companies love MindStride</p>
+    <h2 class="testimonials-heading">Real results for real teams</h2>
+    <div class="testimonials-grid">
+      <div class="testimonial-card">
+        <div class="stars">★★★★★</div>
+        <p class="testimonial-quote">"MindStride is the change we have been looking for to increase utilization rates of mental health at work. Their platform ensures our team has access to a lifecare when needed and creates a more engaged, healthier workforce."</p>
+        <p class="testimonial-author">HR Director, knak</p>
+      </div>
+      <div class="testimonial-card">
+        <div class="stars">★★★★★</div>
+        <p class="testimonial-quote">"MindStride gives far beyond EAP. We use the platform to create a space where people feel seen, heard and treated with dignity. You get a marketplace that actually works and MindStride delivers just that."</p>
+        <p class="testimonial-author">People Operations Lead</p>
+      </div>
+      <div class="testimonial-card">
+        <div class="stars">★★★★★</div>
+        <p class="testimonial-quote">"MindStride has been a game changer for the company. Our staff know what to look for when they access the MindStride platform and these analytics show the impact."</p>
+        <p class="testimonial-author">Chief People Officer</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CTA ── -->
+  <section class="cta-section">
+    <h2 class="cta-heading">Ready to build a healthier workforce?</h2>
+    <p class="cta-sub">Join hundreds of Canadian companies supporting their employees with MindStride.</p>
+    <button class="cta-btn">Book your free demo</button>
+  </section>
+
+  <footer>
+    <span class="footer-logo">MindStride</span>
+    <span>© 2025 MindStride Inc. — Employee Health Platform</span>
+  </footer>
+
+  <script>
+    gsap.registerPlugin(ScrollTrigger);
+
+    /* ── MODULE 01: Text Mask Reveal ── */
+    const headline = document.getElementById('heroHeadline');
+    gsap.set(headline, { backgroundPositionX: '100%' });
+    gsap.to(headline, {
+      backgroundPositionX: '0%',
+      ease: 'none',
+      scrollTrigger: { trigger: headline, start: 'top 75%', end: 'center 30%', scrub: 1.2 }
+    });
+
+    /* ── MODULE 20: Odometer Counter ── */
+    function animateReel(reelId, targetIndex, duration = 1.2) {
+      const reel = document.getElementById(reelId);
+      if (!reel) return;
+      const itemH = reel.children[0].offsetHeight;
+      gsap.to(reel, {
+        y: -(targetIndex * itemH),
+        duration,
+        ease: 'power3.out',
+      });
+    }
+
+    ScrollTrigger.create({
+      trigger: '#stats',
+      start: 'top 65%',
+      once: true,
+      onEnter: () => {
+        // "1 in 3"
+        animateReel('reel1b', 3, 1.0);
+        // "1 in 4"
+        animateReel('reel2a', 1, 0.6);
+        animateReel('reel2b', 4, 1.1);
+        // "52%"
+        animateReel('reel3', 10, 1.4); // index 10 = '5' (we show 5 at position 10, then suffix %)
+      }
+    });
+
+    /* ── MODULE 02: Sticky Stack Narrative ── */
+    const items = document.querySelectorAll('.narrative-item');
+    const problemIcon  = document.getElementById('problemIcon');
+    const problemTitle = document.getElementById('problemTitle');
+    const problemBody  = document.getElementById('problemBody');
+
+    items.forEach((item, i) => {
+      ScrollTrigger.create({
+        trigger: item,
+        start: 'top center',
+        end: 'bottom center',
+        onEnter:     () => activateItem(i),
+        onEnterBack: () => activateItem(i),
+      });
+    });
+
+    function activateItem(index) {
+      items.forEach((el, i) => el.classList.toggle('active', i === index));
+      const item = items[index];
+      problemIcon.textContent  = item.dataset.icon;
+      problemTitle.textContent = item.dataset.title;
+      problemBody.textContent  = item.dataset.body;
+    }
+
+    /* ── MODULE 16: Spotlight Border Cards ── */
+    document.querySelectorAll('.sp-card').forEach(card => {
+      card.addEventListener('mousemove', e => {
+        const r = card.getBoundingClientRect();
+        card.style.setProperty('--mouse-x', `${e.clientX - r.left}px`);
+        card.style.setProperty('--mouse-y', `${e.clientY - r.top}px`);
+      });
+    });
+  </script>
+</body>
+</html>
